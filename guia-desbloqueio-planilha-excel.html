@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Guia Universal — Desbloquear Planilha Excel</title>
+
+<style>
+:root {
+  --bg: #020617;
+  --card: #0f172a;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --accent: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --border: #1f2937;
+  --code-bg: #020617;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 40px 16px;
+  background: radial-gradient(circle at top, #020617, #000);
+  font-family: "Segoe UI", Inter, system-ui, sans-serif;
+  color: var(--text);
+}
+
+.container {
+  max-width: 980px;
+  margin: auto;
+  background: var(--card);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  border: 1px solid var(--border);
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 16px;
+}
+
+h2 {
+  margin-top: 48px;
+  font-size: 1.6rem;
+  border-left: 5px solid var(--accent);
+  padding-left: 14px;
+}
+
+h3 {
+  margin-top: 32px;
+  font-size: 1.2rem;
+  color: var(--accent);
+}
+
+p {
+  color: var(--muted);
+  margin: 12px 0;
+}
+
+strong {
+  color: var(--text);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 40px 0;
+}
+
+blockquote {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 5px solid var(--warning);
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 24px 0;
+}
+
+ul, ol {
+  margin-left: 20px;
+}
+
+li {
+  margin: 6px 0;
+}
+
+pre {
+  background: var(--code-bg);
+  padding: 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+code {
+  font-family: Consolas, monospace;
+  color: #a5f3fc;
+}
+
+.badge-ok {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.badge-no {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+.footer {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>🧩 Guia Universal — Desbloquear Planilha Excel Protegida (XLSX / XLSM)</h1>
+
+<p>
+Este tutorial ensina <strong>como remover proteção de planilhas do Excel</strong> usando
+<strong>Prompt de Comando / PowerShell</strong>, funcionando em
+<strong>qualquer computador Windows</strong>, <strong>qualquer pasta</strong> e
+<strong>qualquer planilha <code>.xlsx</code> ou <code>.xlsm</code></strong>.
+</p>
+
+<blockquote>
+<strong>⚠️ Importante</strong>
+<ul>
+<li>Este método <strong>NÃO quebra senha para abrir o arquivo</strong>.</li>
+<li>Funciona apenas para <strong>“Planilha protegida”</strong>.</li>
+<li>Utilize apenas em arquivos <strong>de sua autoria ou com autorização</strong>.</li>
+</ul>
+</blockquote>
+
+<hr>
+
+<h2>📌 Quando este método funciona?</h2>
+
+<p class="badge-ok">✔ Arquivo abre normalmente no Excel</p>
+<p class="badge-ok">✔ Mensagem “Planilha protegida”</p>
+<p class="badge-ok">✔ Não pede senha ao abrir</p>
+
+<p class="badge-no">❌ Não funciona para:</p>
+<ul>
+<li>Senha para abrir o arquivo</li>
+<li>Projeto VBA protegido por senha</li>
+</ul>
+
+<hr>
+
+<h2>🛠️ O que vamos fazer (conceito)</h2>
+
+<p>Arquivos <code>.xlsx</code> e <code>.xlsm</code> são <strong>ZIPs disfarçados</strong>. O processo consiste em:</p>
+
+<ol>
+<li>Renomear o arquivo para <code>.zip</code></li>
+<li>Extrair o conteúdo</li>
+<li>Remover a tag <code>&lt;sheetProtection /&gt;</code></li>
+<li>Compactar novamente</li>
+<li>Renomear de volta para Excel</li>
+</ol>
+
+<hr>
+
+<h2>🚀 PASSO A PASSO UNIVERSAL</h2>
+
+<h3>1️⃣ Abrir o PowerShell</h3>
+<pre><code>Win + R → powershell</code></pre>
+
+<h3>2️⃣ Ir até a pasta do arquivo</h3>
+<pre><code>cd $env:USERPROFILE\Desktop</code></pre>
+
+<pre><code>cd "C:\Caminho\Da\Pasta"</code></pre>
+
+<h3>3️⃣ Renomear para ZIP</h3>
+<pre><code>Rename-Item "ARQUIVO.xlsx" "ARQUIVO.zip"</code></pre>
+
+<h3>4️⃣ Extrair o conteúdo</h3>
+<pre><code>Expand-Archive "ARQUIVO.zip" temp</code></pre>
+
+<h3>5️⃣ Remover proteção</h3>
+<pre><code>Get-ChildItem temp\xl\worksheets\*.xml |
+ForEach-Object {
+    (Get-Content $_) -replace '&lt;sheetProtection[^&gt;]*/&gt;', '' |
+    Set-Content $_
+}</code></pre>
+
+<h3>6️⃣ Recompactar</h3>
+<pre><code>Compress-Archive temp\* "ARQUIVO_DESBLOQUEADO.zip"</code></pre>
+
+<h3>7️⃣ Renomear para Excel</h3>
+<pre><code>Rename-Item "ARQUIVO_DESBLOQUEADO.zip" "ARQUIVO_DESBLOQUEADO.xlsx"</code></pre>
+
+<h3>8️⃣ (Opcional) Limpar temporários</h3>
+<pre><code>Remove-Item temp -Recurse -Force</code></pre>
+
+<hr>
+
+<h2>✅ Resultado Final</h2>
+
+<pre><code>ARQUIVO_DESBLOQUEADO.xlsx</code></pre>
+
+<p>
+✔ Planilhas editáveis<br>
+✔ Fórmulas preservadas<br>
+✔ Macros preservadas (XLSM)
+</p>
+
+<hr>
+
+<h2>📎 Conclusão</h2>
+
+<p>
+Este é um <strong>método coringa</strong>, rápido e confiável para desbloquear planilhas
+protegidas do Excel <strong>sem usar programas externos</strong>.
+</p>
+
+<div class="footer">
+Use com responsabilidade ✅
+</div>
+
+</div>
+</body>
+</html>
